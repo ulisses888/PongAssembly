@@ -16,6 +16,10 @@ jal bordas
 
 li $s0,13 #base p1
 li $s1,13 #base p2
+li $s2,15 #x bola
+li $s3,15 #y bola
+li $s4,1 # 1 direita -1 esquerda
+li $s5,0 # 1 = cima, 0 = reto, -1 baixo
 #tamanho raquete 5
 
 jal raquetes
@@ -49,26 +53,44 @@ li   $t2, 'l'
 beq  $t1, $t2, player2Baixo
 
 atualizar:
-# Aqui pode atualizar a bola, IA do jogador 2, etc.
+#jal atualizarBola
 j loopPrincipal
 
 li $v0,10
 syscall
-##############
-
+###############
 bola:
 addi $sp,$sp,-4
 sw $ra,($sp)
 
-li $a0,15
-li $a1,15
+move $a0,$s2
+move $a1,$s3
 li $a2,4
 jal pintar
 
 lw $ra,($sp)
 addi $sp,$sp,4
 jr $ra
-##############
+###############
+atualizarBola:
+
+addi $sp,$sp,-4
+sw $ra,($sp)
+
+move $a0,$s2
+move $a1,$s3
+li $a2,0
+jal pintar
+
+add $s2,$s2,$s4
+add $s3,$s3,$s5
+
+jal bola
+
+lw $ra,($sp)
+addi $sp,$sp,4
+jr $ra
+###############
 
 player1Cima:
 beq $s0,1,fimMovimento
@@ -93,7 +115,7 @@ li $a2,0
 jal pintar
 j loopPrincipal
 
-##############
+###############
 
 player2Cima:
 beq $s1,1,fimMovimento
@@ -118,10 +140,10 @@ li $a2,0
 jal pintar
 j loopPrincipal
 
-##############
+###############
 fimMovimento:
 j loopPrincipal
-##############
+###############
 raquetes: #13-17 xp1 - 1 x p2 - 30 bases em s0 e s1
 addi $sp,$sp,-4
 sw $ra,($sp)
@@ -139,7 +161,7 @@ addi $a1,$a1,1
 addi $t8,$t8,1
 beq $t8,5,proxDesenho
 j desenharp1
-#####
+###############
 proxDesenho:
 li $t8,0
 li $a0,30
@@ -157,9 +179,9 @@ eliminarBordas:
 lw $ra,($sp)
 addi $sp,$sp,4
 jr $ra
-##############
+###############
 
-##############
+###############
 bordas:
 li $a0,0
 li $a1,0
@@ -188,9 +210,9 @@ fimBordas:
 lw $ra,($sp)
 addi $sp,$sp,4
 jr $ra
-#############
+###############
 
-#############
+###############
 reset:
 li $a0,0
 li $a1,0
@@ -215,7 +237,7 @@ addi $sp,$sp,4
 jr $ra
 ###############
 
-###########
+###############
 pintar: # a0 = x, a1 = y, a2 = cor (0 = preto, 1 = marrom, 2 = vermelho, 3 = azul)
 
 li $t7,0x10010000 
@@ -235,4 +257,4 @@ add $t5,$t4,$t5
 lw $t5,($t5)
 sw $t5, 0($t7)
 jr $ra                    
-############
+###############
