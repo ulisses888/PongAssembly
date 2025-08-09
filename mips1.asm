@@ -3,7 +3,7 @@
 .data
 	bitmap: .space 4096
 	tamanho: .word 4
-	vetor: .word 0xFF000000, 0xff873800, 0xff0022, 0x0400ff #Preto,Marrom,Vermelho e Azul
+	vetor: .word 0xFF000000, 0xff873800, 0xff0022, 0x0400ff, 0xFFFFFFFF #Preto,Marrom,Vermelho,Azul e Branco
 .text
 li $t0,0x10010000 #endereco base
 # Endereços MMIO
@@ -19,6 +19,8 @@ li $s1,13 #base p2
 #tamanho raquete 5
 
 jal raquetes
+jal bola
+
 j loopPrincipal
 
 
@@ -54,26 +56,71 @@ li $v0,10
 syscall
 ##############
 
+bola:
+addi $sp,$sp,-4
+sw $ra,($sp)
+
+li $a0,15
+li $a1,15
+li $a2,4
+jal pintar
+
+lw $ra,($sp)
+addi $sp,$sp,4
+jr $ra
+##############
+
 player1Cima:
 beq $s0,1,fimMovimento
 
 addi $s0,$s0,-1
-    
-	
-    
-
-fimMovimento:
-    jr $ra
+jal raquetes
+li $a0,1
+move $a1,$s0
+addi $a1,$a1,5
+li $a2,0
+jal pintar
+j loopPrincipal
 
 player1Baixo:
-
+beq $s0,26,fimMovimento
+addi $s0,$s0,1
+jal raquetes
+li $a0,1
+move $a1,$s0
+addi $a1,$a1,-1
+li $a2,0
+jal pintar
+j loopPrincipal
 
 ##############
 
 player2Cima:
+beq $s1,1,fimMovimento
+
+addi $s1,$s1,-1
+jal raquetes
+li $a0,30
+move $a1,$s1
+addi $a1,$a1,5
+li $a2,0
+jal pintar
+j loopPrincipal
 
 player2Baixo:
+beq $s1,26,fimMovimento
+addi $s1,$s1,1
+jal raquetes
+li $a0,30
+move $a1,$s1
+addi $a1,$a1,-1
+li $a2,0
+jal pintar
+j loopPrincipal
 
+##############
+fimMovimento:
+j loopPrincipal
 ##############
 raquetes: #13-17 xp1 - 1 x p2 - 30 bases em s0 e s1
 addi $sp,$sp,-4
@@ -103,11 +150,10 @@ desenharp2:
 jal pintar
 addi $a1,$a1,1
 addi $t8,$t8,1
-beq $t8,5,fimDesenhar
+beq $t8,5,eliminarBordas
 j desenharp2
 
-
-fimDesenhar:
+eliminarBordas:
 lw $ra,($sp)
 addi $sp,$sp,4
 jr $ra
