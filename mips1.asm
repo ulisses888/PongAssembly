@@ -14,6 +14,9 @@ li $s7, 0xFFFF0004   # Keyboard Data
 jal reset
 jal bordas
 
+li  $t9, 0       # contador de delay da bols
+#li  $s7, 40000)
+
 li $s0,13 #base p1
 li $s1,13 #base p2
 li $s2,15 #x bola
@@ -53,8 +56,12 @@ li   $t2, 'l'
 beq  $t1, $t2, player2Baixo
 
 atualizar:
-jal atualizarBola
-j loopPrincipal
+addi $t9, $t9, 1
+bne  $t9, 40000, pulaAtualizar
+jal  atualizarBola
+li   $t9, 0
+pulaAtualizar:
+j    loopPrincipal
 
 li $v0,10
 syscall
