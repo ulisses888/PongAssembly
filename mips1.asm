@@ -155,8 +155,10 @@ jr $ra
 
 colisaoTopo:
 bne $s3,1,devolve
-beq $s5,1,colidiuCima
-j devolve
+li  $t0, -1
+bne $s5, $t0, devolve
+li  $s5, 1
+jr  $ra
 
 colidiuCima:
 li $s5,-1
@@ -164,8 +166,10 @@ jr $ra
 
 colisaoBase:
 bne $s3,30,devolve
-beq $s5,-1,colidiuBaixo
-j devolve
+li  $t0, 1
+bne $s5, $t0, devolve
+li  $s5, -1  
+jr  $ra
 
 colidiuBaixo:
 li $s5,1
