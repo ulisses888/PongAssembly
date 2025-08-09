@@ -1,6 +1,6 @@
 Um clone do jogo Pong, feito em assembly do MIPS usando a ferramenta MARS 4.5
 
-Trabalho desenvolvido para a disciplina de Arquitetura e Organização de Computadores
+Trabalho desenvolvido para a disciplina de Arquitetura e Organização de Computadores, Curso de Ciência da Computação - Universidade Federal de Pelotas (UFPel)
 
 Para rodar:
 
