@@ -11,10 +11,17 @@
 	vetor: .word 0xFF000000, 0xff873800, 0xff0022, 0x0400ff, 0xFFFFFFFF #Preto,Marrom,Vermelho,Azul e Branco
 	fraseMenu: .asciiz "\n\nEscolha uma das opções abaixo:\n 1 - Jogar\n 2 - Como Jogar\n 3 - Sair\n"
 	comoJogar1: .asciiz "\n\nConecte o Bitmap display e o Teclado\n Unit 8x8 Display 256x256\n Base adress - Static data"
-	comoJogar2: .asciiz "\nPlayer 1 - W Para cima e S Para baixo\nPlayer 2 - O Para cima e L Para baixo"
+	comoJogar2: .asciiz "\nPlayer 1 - W Para cima e S Para baixo\nPlayer 2 - O Para cima e L Para baixo\nNao segure os botoes apenas clique!"
 	comoJogar3: .asciiz "\nDesative o CAPSLOCK do teclado!"
 	comoJogar4: .asciiz "\nBom jogo, ganha o usuario que fizer 5 pontos primeiro\n"
 	comoJogar5: .asciiz "Digite 1 para continuar ou qualquer outra tecla para sair\n"
+	pontosP1: .word 0
+	pontosP2: .word 0
+	p1Pontua: .asciiz "Ponto do Player 1"
+	p2Pontua: .asciiz "Ponto do Player 2"
+	placar: .asciiz "\nPlacar:\n"
+	placarX: .asciiz " X "
+	continuar: .asciiz "Continuar partida"
 .text
 
 menu:
@@ -129,6 +136,26 @@ jal pintar
 lw $ra,($sp)
 addi $sp,$sp,4
 jr $ra
+
+resetBola:
+li $s0,13 #base p1
+li $s1,13 #base p2
+li $s2,15 #x bola
+li $s3,15 #y bola
+li $s4,1 # 1 direita -1 esquerda
+li $s5,0 # 1 = cima, 0 = reto, -1 baixo
+
+addi $sp,$sp,-4
+sw $ra,($sp)
+
+jal reset
+jal bordas
+jal raquetes
+jal bola
+
+lw $ra,($sp)
+addi $sp,$sp,4
+jr $ra
 ###############
 atualizarBola:
 
@@ -139,6 +166,8 @@ jal colisaoEsquerda
 jal colisaoDireita
 jal colisaoTopo
 jal colisaoBase
+jal player1pontua
+jal player2pontua
 
 move $a0,$s2
 move $a1,$s3
@@ -398,5 +427,51 @@ lw $t5,($t5)
 sw $t5, 0($t7)
 jr $ra                    
 ###############
+# $s2 - x bola
+player2pontua:
+bne $s2,0,devolve
+lw $t0,pontosP2
+addi $t0,$t0,1
+sw $t0,pontosP2
 
+li $v0,55
+la $a0,p2Pontua
+li $a1,1
+syscall
+j imprimirPlacar
 ###############
+# $s2 - x bola
+player1pontua:
+bne $s2,31,devolve
+lw $t0,pontosP1
+addi $t0,$t0,1
+sw $t0,pontosP1
+
+li $v0,55
+la $a0,p1Pontua
+li $a1,1
+syscall
+j imprimirPlacar
+###############
+imprimirPlacar:
+li $v0,4
+la $a0,placar
+syscall
+
+lw $a0,pontosP1
+li $v0,1
+syscall
+
+li $v0,4
+la $a0,placarX
+syscall
+
+li $v0,1
+lw $a0,pontosP2
+syscall
+
+li $v0,55
+la $a0,continuar
+syscall
+
+j resetBola
