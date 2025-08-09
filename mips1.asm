@@ -22,6 +22,9 @@
 	placar: .asciiz "\nPlacar:\n"
 	placarX: .asciiz " X "
 	continuar: .asciiz "Continuar partida"
+	vitoriaP1: .asciiz "Player 1 Ganhou!!"
+	vitoriaP2: .asciiz "Player 2 Ganhou!!"
+	fim: .asciiz "Fim da partida voce voltara ao menu!"
 .text
 
 menu:
@@ -470,8 +473,36 @@ li $v0,1
 lw $a0,pontosP2
 syscall
 
+beq $a0,5,p2
+lw $a0,pontosP1
+beq $a0,5,p1
+
 li $v0,55
 la $a0,continuar
+li $a1,1
 syscall
 
 j resetBola
+
+p1:
+li $v0,55
+la $a0,vitoriaP1
+li $a1,1
+syscall
+j fimPartida
+p2:
+li $v0,55
+la $a0,vitoriaP2
+li $a1,1
+syscall
+
+fimPartida:
+li $v0,55
+la $a0,fim
+li $a1,1
+
+li $a0,0
+sw $a0,pontosP1
+sw $a0,pontosP2
+
+j menu
