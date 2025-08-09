@@ -10,7 +10,6 @@ li $t0,0x10010000 #endereco base
 li $s6, 0xFFFF0000   # Keyboard Control
 li $s7, 0xFFFF0004   # Keyboard Data
 
-
 jal reset
 jal bordas
 
@@ -24,7 +23,7 @@ li $s3,15 #y bola
 li $s4,1 # 1 direita -1 esquerda
 li $s5,0 # 1 = cima, 0 = reto, -1 baixo
 #tamanho raquete 5
-
+# 32 x 32 tamanho grid
 jal raquetes
 jal bola
 
@@ -86,6 +85,8 @@ sw $ra,($sp)
 
 jal colisaoEsquerda
 jal colisaoDireita
+jal colisaoTopo
+jal colisaoBase
 
 move $a0,$s2
 move $a1,$s3
@@ -113,7 +114,24 @@ addi $t0,$t0,1
 j loopEsquerda
 colidiuEsq:
 li $s4,1
+beq $t1,0,colidiuBaixoRaquete
+beq $t1,1,colidiuBaixoRaquete
+beq $t1,2,colidiuRetoRaquete
+beq $t1,3,colidiuCimaRaquete
+beq $t1,4,colidiuCimaRaquete
 jr $ra
+###################
+colidiuRetoRaquete:
+li $s5,0
+j devolve
+colidiuCimaRaquete:
+li $s5,1
+j devolve
+colidiuBaixoRaquete:
+li $s5,-1
+j devolve
+# s5 1 = cima, 0 = reto, -1 baixo
+###################
 colisaoDireita:
 bne $s2,29,devolve
 move $t0,$s1
@@ -126,9 +144,33 @@ addi $t0,$t0,1
 j loopDireita
 colidiuDir:
 li $s4,-1
+beq $t1,0,colidiuBaixoRaquete
+beq $t1,1,colidiuBaixoRaquete
+beq $t1,2,colidiuRetoRaquete
+beq $t1,3,colidiuCimaRaquete
+beq $t1,4,colidiuCimaRaquete
 jr $ra
 devolve:
 jr $ra
+
+colisaoTopo:
+bne $s3,1,devolve
+beq $s5,1,colidiuCima
+j devolve
+
+colidiuCima:
+li $s5,-1
+jr $ra
+
+colisaoBase:
+bne $s3,30,devolve
+beq $s5,-1,colidiuBaixo
+j devolve
+
+colidiuBaixo:
+li $s5,1
+jr $ra
+
 ###############
 #li $s4,1 # 1 direita -1 esquerda
 #li $s5,0 # 1 = cima, 0 = reto, -1 baixo
