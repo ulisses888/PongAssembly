@@ -53,7 +53,7 @@ li   $t2, 'l'
 beq  $t1, $t2, player2Baixo
 
 atualizar:
-#jal atualizarBola
+jal atualizarBola
 j loopPrincipal
 
 li $v0,10
@@ -77,6 +77,9 @@ atualizarBola:
 addi $sp,$sp,-4
 sw $ra,($sp)
 
+jal colisaoEsquerda
+jal colisaoDireita
+
 move $a0,$s2
 move $a1,$s3
 li $a2,0
@@ -90,6 +93,38 @@ jal bola
 lw $ra,($sp)
 addi $sp,$sp,4
 jr $ra
+
+colisaoEsquerda:
+bne $s2,2,devolve
+move $t0,$s0
+li $t1,0 # contador
+loopEsquerda:
+beq $t1,5,devolve
+beq $t0,$s3,colidiuEsq
+addi $t1,$t1,1
+addi $t0,$t0,1
+j loopEsquerda
+colidiuEsq:
+li $s4,1
+jr $ra
+colisaoDireita:
+bne $s2,29,devolve
+move $t0,$s1
+li $t1,0 # contador
+loopDireita:
+beq $t1,5,devolve
+beq $t0,$s3,colidiuDir
+addi $t1,$t1,1
+addi $t0,$t0,1
+j loopDireita
+colidiuDir:
+li $s4,-1
+jr $ra
+devolve:
+jr $ra
+###############
+#li $s4,1 # 1 direita -1 esquerda
+#li $s5,0 # 1 = cima, 0 = reto, -1 baixo
 ###############
 
 player1Cima:
