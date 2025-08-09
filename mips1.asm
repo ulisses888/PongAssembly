@@ -1,12 +1,64 @@
-# endereco base 0x10010000
+#Unit Width 8
+#Unit Height 8
+#Display Width 256
+#Display Height 256
+#Base address 0x10010000 (static data)
+
 
 .data
 	bitmap: .space 4096
 	tamanho: .word 4
 	vetor: .word 0xFF000000, 0xff873800, 0xff0022, 0x0400ff, 0xFFFFFFFF #Preto,Marrom,Vermelho,Azul e Branco
+	fraseMenu: .asciiz "\n\nEscolha uma das opções abaixo:\n 1 - Jogar\n 2 - Como Jogar\n 3 - Sair\n"
+	comoJogar1: .asciiz "\n\nConecte o Bitmap display e o Teclado\n Unit 8x8 Display 256x256\n Base adress - Static data"
+	comoJogar2: .asciiz "\nPlayer 1 - W Para cima e S Para baixo\nPlayer 2 - O Para cima e L Para baixo"
+	comoJogar3: .asciiz "\nDesative o CAPSLOCK do teclado!"
+	comoJogar4: .asciiz "\nBom jogo, ganha o usuario que fizer 5 pontos primeiro\n"
+	comoJogar5: .asciiz "Digite 1 para continuar ou qualquer outra tecla para sair\n"
 .text
+
+menu:
+li $v0,4
+la $a0,fraseMenu
+syscall
+
+li $v0,5
+syscall
+
+beq $v0,1,iniciar
+beq $v0,2,tutorial
+
+j sair
+
+tutorial:
+li $v0,4
+la $a0,comoJogar1
+syscall
+
+la $a0,comoJogar2
+syscall
+
+la $a0,comoJogar3
+syscall
+
+la $a0,comoJogar4
+syscall
+
+la $a0,comoJogar5
+syscall
+
+li $v0,5
+syscall
+
+beq $v0,1,menu
+
+sair:
+li $v0,10
+syscall
+
+iniciar:
+
 li $t0,0x10010000 #endereco base
-# Endereços MMIO
 li $s6, 0xFFFF0000   # Keyboard Control
 li $s7, 0xFFFF0004   # Keyboard Data
 
@@ -345,4 +397,6 @@ add $t5,$t4,$t5
 lw $t5,($t5)
 sw $t5, 0($t7)
 jr $ra                    
+###############
+
 ###############
